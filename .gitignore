@@ -1,0 +1,90 @@
+# =================================================================
+# PYTHON ARTIFACTS
+# =================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# =================================================================
+# VIRTUAL ENVIRONMENTS
+# =================================================================
+.venv/
+venv/
+ENV/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# =================================================================
+# SECURITY AND ENVIRONMENTAL VARIABLES (Security First)
+# =================================================================
+# Local environment variables files
+.env
+.env.local
+.env.test
+.env.production
+
+# Secret keys and certificate files
+*.pem
+*.key
+*.pub
+*.crt
+*.pfx
+
+# AWS CLI local configuration (NEVER! leak account ID)
+.aws/
+credentials
+config
+
+# =================================================================
+# IDE / EDITORS (VS Code, PyCharm, OS)
+# =================================================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# =================================================================
+# DOCKER
+# =================================================================
+.docker/
+*.log
+docker-compose.override.yml
+
+# =================================================================
+# DATA, DOCUMENTATION AND DIAGNOSIS
+# =================================================================
+# If you download data for testing, do not include it in the repository
+data/*.csv
+data/*.json
+data/*.parquet
+!data/.gitkeep
+
+# Peroformance and test reports
+reports/
+locust_reports/
+*.html
