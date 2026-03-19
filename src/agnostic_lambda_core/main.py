@@ -33,7 +33,7 @@ def handler(event, context):
         }
 
     try:
-        # 1. Intelleigent data load (Adapter logic)
+        # 1. Intelligent data load (Adapter logic)
         if "body" in event:
             if isinstance(event["body"], str):
                 payload = json.loads(event["body"])
