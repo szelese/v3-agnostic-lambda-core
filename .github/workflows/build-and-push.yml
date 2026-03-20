@@ -1,0 +1,75 @@
+name: Build and Push Lambda Image
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Load deploy config
+        id: cfg
+        shell: bash
+        run: |
+          source deploy/dev.env
+          echo "aws_region=$AWS_REGION" >> "$GITHUB_OUTPUT"
+          echo "ecr_repository_name=$ECR_REPOSITORY_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Run unit tests
+        run: |
+          PYTHONPATH=src pytest -q
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.GHA_ROLE_ARN }}
+          aws-region: ${{ steps.cfg.outputs.aws_region }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Resolve ECR repository URI
+        id: ecr
+        shell: bash
+        run: |
+          REPO_URI=$(aws ecr describe-repositories \
+            --region "${{ steps.cfg.outputs.aws_region }}" \
+            --repository-names "${{ steps.cfg.outputs.ecr_repository_name }}" \
+            --query 'repositories[0].repositoryUri' \
+            --output text)
+
+          echo "repo_uri=$REPO_URI" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image
+        shell: bash
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            -t "${{ steps.ecr.outputs.repo_uri }}:latest" \
+            -t "${{ steps.ecr.outputs.repo_uri }}:${{ github.sha }}" \
+            --push .
